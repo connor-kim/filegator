@@ -19,3 +19,6 @@ Thumbs.db
 # 임시 파일
 *.log
 *.tmp
+
+# AI 에이전트 작업 디렉토리
+.sisyphus/

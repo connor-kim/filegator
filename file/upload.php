@@ -2,32 +2,17 @@
 include_once '../inc/header.php';
 include_once '../inc/nav.php';
 include_once '../inc/db.php';
+include_once '../inc/file_helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../user/login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
 $parent_id = isset($_GET['parent_id']) ? (int)$_GET['parent_id'] : null;
 
-// Breadcrumb navigation (현재 위치 표시용)
-$breadcrumbs = [];
-$current_parent = $parent_id;
-while ($current_parent !== null) {
-    $stmt = $conn->prepare("SELECT parent_id, filename FROM files WHERE id = ? AND user_id = ? AND is_folder = 1");
-    $stmt->bind_param("ii", $current_parent, $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        array_unshift($breadcrumbs, ['id' => $current_parent, 'name' => $row['filename']]);
-        $current_parent = $row['parent_id'];
-    } else {
-        $current_parent = null;
-    }
-    $stmt->close();
-}
+// Breadcrumb navigation (user_id 조건 제거)
+$breadcrumbs = get_breadcrumbs($conn, $parent_id);
 ?>
 
 <div class="content-card mt-2">
